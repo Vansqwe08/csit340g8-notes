@@ -21,13 +21,21 @@ function Notes() {
     const saved = localStorage.getItem('notes')
     return saved ? JSON.parse(saved) : startingNotes
   })
-  
-  const [newNote, setNewNote] = useState({ title: '', body: '' })
+
+  const [form, setForm] = useState({ title: '', body: '' })
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     localStorage.setItem('notes', JSON.stringify(notes))
   }, [notes])
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      localStorage.setItem('draft', JSON.stringify(form))
+      console.log('Draft saved:', form.title)
+    }, 1000)
+    return () => clearTimeout(id)
+  }, [form])
 
 
   const filteredNotes = notes.filter((note) =>
@@ -36,14 +44,14 @@ function Notes() {
 
   function handleNewNoteChange(event) {
     const { name, value } = event.target
-    setNewNote((currentNote) => ({ ...currentNote, [name]: value }))
+    setForm((currentNote) => ({ ...currentNote, [name]: value }))
   }
 
   function handleAddNote(event) {
     event.preventDefault()
 
-    const title = newNote.title.trim()
-    const body = newNote.body.trim()
+    const title = form.title.trim()
+    const body = form.body.trim()
     if (!title || !body) return
 
     setNotes((currentNotes) => [
@@ -54,7 +62,7 @@ function Notes() {
         body,
       },
     ])
-    setNewNote({ title: '', body: '' })
+    setForm({ title: '', body: '' })
   }
 
   function handleDeleteNote(id) {
@@ -83,14 +91,14 @@ function Notes() {
           <input
             name="title"
             placeholder="Title"
-            value={newNote.title}
+            value={form.title}
             onChange={handleNewNoteChange}
             className="h-[52px] w-full border border-[#e6e6e6] px-4 text-lg outline-none placeholder:text-black/40 placeholder:italic focus:border-[#cf7d7d]"
           />
           <textarea
             name="body"
             placeholder="Write your note"
-            value={newNote.body}
+            value={form.body}
             onChange={handleNewNoteChange}
             className="h-[120px] w-full resize-none py-3 border border-[#e6e6e6] px-4 text-lg outline-none placeholder:text-black/40 placeholder:italic focus:border-[#cf7d7d]"
           />
